@@ -31,23 +31,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        listview = findViewById(R.id.listView1);
-        addButton = findViewById(R.id.button1);
-        GetValue = findViewById(R.id.editText1);
-
-        final List<String> ListElementsArrayList = new ArrayList<>(Arrays.asList(ListElements));
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>
-                (MainActivity.this, android.R.layout.simple_list_item_1, ListElementsArrayList);
-        listview.setAdapter(adapter);
-
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ListElementsArrayList.add(GetValue.getText().toString());
-                adapter.notifyDataSetChanged();
-            }
-        });
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

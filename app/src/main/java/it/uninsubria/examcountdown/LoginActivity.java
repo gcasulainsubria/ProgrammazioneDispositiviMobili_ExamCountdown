@@ -27,7 +27,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
-    //private LoginViewModel loginViewModel;
     private EditText emailEditText;
     private EditText passwordEditText;
     private Button loginButton;
@@ -93,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
                                 //if everything goes right launches Main Activity
                                 if (task.isSuccessful()) {
                                     finish();
-                                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                    startActivity(new Intent(getApplicationContext(), ItemListActivity.class));
                                 }
                                 //if some credentials are wrong
                                 else if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
@@ -109,18 +108,5 @@ public class LoginActivity extends AppCompatActivity {
                         });
             }
         }
-
-
-    /*
-    private void updateUiWithUser(LoggedInUserView model) {
-        String welcome = getString(R.string.welcome) + model.getDisplayName();
-        // TODO : initiate successful logged in experience
-        Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
-    }
-
-    private void showLoginFailed(@StringRes Integer errorString) {
-        Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
-    }
-    */
     }
 }
