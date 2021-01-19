@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -20,13 +22,18 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import it.uninsubria.examcountdown.dummy.ExamList;
 import it.uninsubria.examcountdown.dummy.ExamListItem;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,7 +55,7 @@ public class ItemListActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private DatabaseReference mDatabase;
-    private ExamList examList;
+    private static ExamList examList=new ExamList();;
     private String mUserId;
     private ExamItemRecyclerViewAdapter adapter;
 
@@ -57,7 +64,6 @@ public class ItemListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_list);
 
-        examList = new ExamList();
 
         View recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
@@ -71,41 +77,10 @@ public class ItemListActivity extends AppCompatActivity {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
 
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
             @Override
             public void onClick(View view) {
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                builder.setTitle("Title");
-
-
-                // Set up the input
-                final EditText input = new EditText(view.getContext());
-                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                builder.setView(input);
-
-                // Set up the buttons
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //m_Text = input.getText().toString();
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                builder.show();
-
-                ExamListItem item = new ExamListItem();
-                //mDatabase.child("users").child(mUserId).child("exams").push().setValue(item);
-                examList.addItem(item);
-                adapter.notifyItemInserted(1);
-                Snackbar.make(view, "Aggiunto Elemento", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                addExamAlertDialog(view);
             }
         });
 
@@ -156,6 +131,69 @@ public class ItemListActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) { }
         });*/
 
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public void  addExamAlertDialog(View v){
+        AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+        builder.setTitle("Inserisci nuovo esame");
+
+
+        LinearLayout lila1= new LinearLayout(v.getContext());
+        lila1.setOrientation(LinearLayout.VERTICAL);
+        final EditText input1 = new EditText(v.getContext());
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input1.setInputType(InputType.TYPE_CLASS_TEXT);
+        input1.setHint("Nome dell'esame");
+
+
+        final TextView label = new TextView(v.getContext());
+        label.setText("Seleziona Data\n");
+        label.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        label.setTextSize(17);
+        final TextView space = new TextView(v.getContext());
+        space.setText("");
+        space.setTextSize(3);
+        final DatePicker datePicker = new DatePicker(v.getContext());
+        //datePicker.();
+
+        //datePicker.setMinDate(Calendar.getInstance().getTime().getDate());
+                /*final EditText input2 = new EditText(view.getContext());
+                input2.setInputType(InputType.TYPE_CLASS_TEXT);*/
+
+        lila1.addView(input1);
+        lila1.addView(label);
+        //lila1.addView(space);
+        lila1.addView(datePicker);
+        builder.setView(lila1);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String str = input1.getText().toString();
+                String date = ""+datePicker.getYear()+"/"+(datePicker.getMonth()+1)+"/"+datePicker.getDayOfMonth();
+                Date d = new Date(datePicker.getYear(),(datePicker.getMonth()+1),datePicker.getDayOfMonth());
+                addExamToList(str,d);
+                Snackbar.make(v, "Aggiunto Elemento "+ str +" "+date , Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    public void addExamToList(String examName, Date examDate){
+        ExamListItem item = new ExamListItem(examName,examDate);
+        //mDatabase.child("users").child(mUserId).child("exams").push().setValue(item);
+        examList.addItem(item);
+        adapter.notifyItemInserted(1);
     }
 
     /*private void setupRecyclerView(@NonNull RecyclerView recyclerView) {

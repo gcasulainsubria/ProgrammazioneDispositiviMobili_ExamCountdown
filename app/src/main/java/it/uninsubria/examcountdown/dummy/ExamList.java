@@ -30,14 +30,14 @@ public class ExamList {
     public ExamList(){
         this.ITEM_MAP = new HashMap<String, ExamListItem>();
         this.ITEMS = new ArrayList<ExamListItem>();
-        ExamListItem newItem =  new ExamListItem("testExam1", new Date(2020,2,1));
+        /*ExamListItem newItem =  new ExamListItem("testExam1", new Date(2020,2,1));
         addItem(newItem);
 
         newItem =  new ExamListItem("testExam2", new Date(2020,2,1));
         addItem(newItem);
 
         newItem =  new ExamListItem("testExam3", new Date(2020,2,1));
-        addItem(newItem);
+        addItem(newItem);*/
         //this.ITEM_MAP = new HashMap<String, ExamListItem>();
     }
 
