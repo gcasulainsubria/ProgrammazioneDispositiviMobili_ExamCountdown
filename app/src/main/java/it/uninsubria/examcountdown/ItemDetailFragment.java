@@ -49,13 +49,13 @@ public class ItemDetailFragment extends Fragment {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            mItem.examName = getArguments().getString(ARG_ITEM_ID);
+            mItem.setExamName(getArguments().getString(ARG_ITEM_ID));
             //mItem.examDate = getArguments().getString(ARG_ITEM_VALUE);
 
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(mItem.examName);
+                appBarLayout.setTitle(mItem.getExamName());
             }
         }
     }
@@ -67,7 +67,7 @@ public class ItemDetailFragment extends Fragment {
 
         // Show the dummy content as text in a TextView.
         if (mItem != null) {
-            ((TextView) rootView.findViewById(R.id.item_detail)).setText(mItem.examName);
+            ((TextView) rootView.findViewById(R.id.item_detail)).setText(mItem.getExamName());
         }
 
         return rootView;

@@ -18,10 +18,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -30,11 +33,20 @@ import android.widget.TextView;
 import it.uninsubria.examcountdown.dummy.ExamList;
 import it.uninsubria.examcountdown.dummy.ExamListItem;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 
 /**
  * An activity representing a list of Items. This activity
@@ -55,9 +67,11 @@ public class ItemListActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private DatabaseReference mDatabase;
-    private static ExamList examList=new ExamList();;
+    private ExamList examList=new ExamList();
+    Handler handler;
     private String mUserId;
     private ExamItemRecyclerViewAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +97,8 @@ public class ItemListActivity extends AppCompatActivity {
                 addExamAlertDialog(view);
             }
         });
+
+
 
         /*if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
@@ -133,6 +149,14 @@ public class ItemListActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        //remove all timer before pausing app.
+        adapter.clearAll();
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     public void  addExamAlertDialog(View v){
         AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
@@ -173,10 +197,23 @@ public class ItemListActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 String str = input1.getText().toString();
                 String date = ""+datePicker.getYear()+"/"+(datePicker.getMonth()+1)+"/"+datePicker.getDayOfMonth();
-                Date d = new Date(datePicker.getYear(),(datePicker.getMonth()+1),datePicker.getDayOfMonth());
-                addExamToList(str,d);
-                Snackbar.make(v, "Aggiunto Elemento "+ str +" "+date , Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/mm/dd");
+
+                try {
+                    Date strDate = sdf.parse(""+datePicker.getYear()+"/"+(datePicker.getMonth()+1)+"/"+datePicker.getDayOfMonth());
+                    addExamToList(str,strDate);
+                    Collections.sort(examList.getItemListValues());
+
+
+                    Snackbar.make(v, "Aggiunto Elemento "+ str +" "+date , Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+
+                    adapter.notifyDataSetChanged();
+                    str = null;
+                    date = null;
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
             }
         });
@@ -193,7 +230,7 @@ public class ItemListActivity extends AppCompatActivity {
         ExamListItem item = new ExamListItem(examName,examDate);
         //mDatabase.child("users").child(mUserId).child("exams").push().setValue(item);
         examList.addItem(item);
-        adapter.notifyItemInserted(1);
+
     }
 
     /*private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -203,10 +240,14 @@ public class ItemListActivity extends AppCompatActivity {
     public static class ExamItemRecyclerViewAdapter
             extends RecyclerView.Adapter<ExamItemRecyclerViewAdapter.ViewHolder> {
 
-        private final List<ExamListItem> mValues;
+        private List<ExamListItem> mValues;
         private LayoutInflater mInflater;
         private final ItemListActivity mParentActivity;
-        //private final boolean mTwoPane;
+        private Handler handler = new Handler();
+
+        public void clearAll() {
+            handler.removeCallbacksAndMessages(null);
+        }
 
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
@@ -223,12 +264,13 @@ public class ItemListActivity extends AppCompatActivity {
                 } else {*/
                     Context context = view.getContext();
                     Intent intent = new Intent(context, ItemDetailActivity.class);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.examName);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_VALUE, item.examDateStr);
+                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.getExamName());
+                    intent.putExtra(ItemDetailFragment.ARG_ITEM_VALUE, item.getExamDateStr());
                     context.startActivity(intent);
                 //}
             }
         };
+
 
         ExamItemRecyclerViewAdapter(Context context,
                                     ItemListActivity parent,
@@ -239,6 +281,9 @@ public class ItemListActivity extends AppCompatActivity {
             //mTwoPane = twoPane;
         }
 
+        public void setmValues( Collection<ExamListItem> items){
+            this.mValues = (List<ExamListItem>) items;
+        }
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = mInflater.inflate(R.layout.item_list_content, parent, false);
@@ -247,11 +292,24 @@ public class ItemListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mExamName.setText(mValues.get(position).examName);
-            holder.mExamDate.setText(mValues.get(position).examDateStr);
+            holder.mExamName.setText(mValues.get(position).getExamName());
+
+            /*long diffInMillies = mValues.get(position).getExamDate().getTime() - Calendar.getInstance().getTime().getTime();
+            TimeUnit unit = TimeUnit.MINUTES;
+            unit.convert(diffInMillies,TimeUnit.MILLISECONDS);*/
+            handler.removeCallbacks(holder.countdownRunnable);
+
+            //holder.countdownRunnable.mExamDate = timeStamp;
+            holder.countdownRunnable.examDate = mValues.get(position).getExamDate();
+
+            handler.postDelayed(holder.countdownRunnable, 100);
+
+
+            //holder.mExamDate.setText(mValues.get(position).getExamDateStr());
 
             holder.itemView.setTag(mValues.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
+
         }
 
         @Override
@@ -262,11 +320,13 @@ public class ItemListActivity extends AppCompatActivity {
         class ViewHolder extends RecyclerView.ViewHolder {
             final TextView mExamName;
             final TextView mExamDate;
+            CountdownRunnable countdownRunnable;
 
             ViewHolder(View view) {
                 super(view);
                 mExamName = (TextView) view.findViewById(R.id.id_text);
                 mExamDate = (TextView) view.findViewById(R.id.content);
+                countdownRunnable = new CountdownRunnable(handler,mExamDate);
             }
         }
     }

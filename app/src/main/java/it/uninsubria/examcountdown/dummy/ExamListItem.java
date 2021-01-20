@@ -1,33 +1,25 @@
 package it.uninsubria.examcountdown.dummy;
 
-import android.text.format.Time;
-
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
-public class ExamListItem {
+public class ExamListItem implements Comparable<ExamListItem> {
         //public final String id;
-        public String examName;
-        public Date examDate;
-        public String examDateStr;
-        private Calendar calendar;
-        private SimpleDateFormat dateFormat;
+        private String examName;
+        private Date examDate;
+        private String examDateStr;
 
 
         public ExamListItem() {
             //this.id = id;
-            this.calendar = Calendar.getInstance();
-            this.dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             this.examDate = new Date();
             this.examDateStr = "";
             }
 
         public ExamListItem(String exameName, Date examDate) {
-            this.calendar = Calendar.getInstance();
-            this.dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             this.examDate = examDate;
-            this.examDateStr = dateFormat.format(examDate);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/mm/dd");
+            this.examDateStr = sdf.format(examDate);
             this.examName = exameName;
 
         }
@@ -38,10 +30,38 @@ public class ExamListItem {
             //this.exameDate = exameDate;
         }
 
+    public String getExamDateStr() {
+        return examDateStr;
+    }
 
+    public void setExamDateStr(String examDateStr) {
+        this.examDateStr = examDateStr;
+    }
 
-        @Override
-        public String toString() {
-            return examName;
+    public String getExamName() {
+        return examName;
+    }
+
+    public void setExamName(String examName) {
+        this.examName = examName;
+    }
+
+    public Date getExamDate() {
+        return examDate;
+    }
+
+    public void setExamDate (Date var){
+        this.examDate = var;
+    }
+
+    @Override
+    public String toString() {
+            return examDateStr+examName;
         }
+
+    @Override
+    public int compareTo(ExamListItem o) {
+        return getExamDateStr().compareTo(o.getExamDateStr());
+    }
+
 }

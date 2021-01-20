@@ -1,13 +1,7 @@
 package it.uninsubria.examcountdown.dummy;
 
-import androidx.annotation.ArrayRes;
-
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Helper class for providing sample content for user interfaces created by
@@ -51,15 +45,15 @@ public class ExamList {
     }*/
 
     public void addItem(ExamListItem item) {
-        ITEM_MAP.put(item.examName,item);
+        ITEM_MAP.put(item.getExamName(),item);
         ITEMS.add(item);
         //ITEM_MAP.put(item.id, item);
     }
 
     public void removeItem(ExamListItem item) {
-        ITEM_MAP.remove(item.examName);
+        ITEM_MAP.remove(item.getExamName());
         for(int i =0;i<ITEMS.size();i++){
-            if(ITEMS.get(i).examName.equals(item.examName)){
+            if(ITEMS.get(i).getExamName().equals(item.getExamName())){
                 ITEMS.remove(i);
                 }
         }
@@ -70,7 +64,7 @@ public class ExamList {
         return this.ITEM_MAP;
     }
 
-    public Collection<ExamListItem> getItemListValues (){
+    public ArrayList<ExamListItem> getItemListValues (){
         return ITEMS;
         /*ArrayList<ExamListItem> collection = new ArrayList<ExamListItem>();
 
