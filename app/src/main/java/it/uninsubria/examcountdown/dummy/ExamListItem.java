@@ -1,5 +1,8 @@
 package it.uninsubria.examcountdown.dummy;
 
+import android.util.Log;
+
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -31,7 +34,14 @@ public class ExamListItem implements Comparable<ExamListItem> {
 
     public void setExamDateStr(String examDateStr) {
         this.examDateStr = examDateStr;
-    }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        try {
+            this.examDate = sdf.parse(examDateStr);
+            }
+        catch (ParseException ex) {
+            Log.v("Exception", ex.getLocalizedMessage());
+            }
+        }
 
     public String getExamName() {
         return examName;

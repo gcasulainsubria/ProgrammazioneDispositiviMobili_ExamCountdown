@@ -18,7 +18,10 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.ActionBar;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Calendar;
 
 import it.uninsubria.examcountdown.dummy.ExamListItem;
 
@@ -70,8 +73,34 @@ public class ItemDetailActivity extends AppCompatActivity {
 
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) this.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(""+mItem.getExamName()+" "+mItem.getExamDateStr());
+                appBarLayout.setTitle(""+mItem.getExamName());
                 }
+
+            Calendar now = Calendar.getInstance();
+            long different = mItem.getExamDate().getTime() - now.getTimeInMillis();
+
+            long secondsInMilli = 1000;
+            long minutesInMilli = secondsInMilli * 60;
+            long hoursInMilli = minutesInMilli * 60;
+            long daysInMilli = hoursInMilli * 24;
+
+            long elapsedDays = different / daysInMilli;
+            different = different % daysInMilli;
+
+            long elapsedHours = different / hoursInMilli;
+            different = different % hoursInMilli;
+
+            long elapsedMinutes = different / minutesInMilli;
+            different = different % minutesInMilli;
+
+            long elapsedSeconds = different / secondsInMilli;
+
+            TextView examDetail = (TextView)findViewById(R.id.textViewDetail);
+            examDetail.setText( "\n Data Esame: "+mItem.getExamDateStr()+
+                                "\n Giorni Rimanenti: "+elapsedDays+
+                                "\n Ore Rimanenti: "+elapsedHours+
+                                "\n Minuti Rimanenti: "+elapsedMinutes+
+                                "\n Secondi Rimanenti: "+elapsedSeconds);
 
             FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
             fab.setOnClickListener(new View.OnClickListener() {

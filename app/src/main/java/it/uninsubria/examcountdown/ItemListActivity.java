@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -21,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import android.os.Handler;
 import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
@@ -45,8 +47,6 @@ public class ItemListActivity extends AppCompatActivity {
     private String mUserId;
     private ExamList examList=new ExamList();
     private ExamItemRecyclerViewAdapter adapter;
-    //Handler handler;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +57,12 @@ public class ItemListActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
+        // Show the Up button in the action bar.
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -116,6 +122,18 @@ public class ItemListActivity extends AppCompatActivity {
         //remove all timer before pausing app.
         adapter.clearAll();
         }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            mFirebaseAuth.signOut();
+            Intent intent = new Intent(this, LoginActivity.class);
+            this.startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     public void  addExamAlertDialog(View v){
