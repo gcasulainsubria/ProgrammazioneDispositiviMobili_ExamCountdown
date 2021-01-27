@@ -4,30 +4,25 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ExamListItem implements Comparable<ExamListItem> {
-        //public final String id;
-        private String examName;
-        private Date examDate;
-        private String examDateStr;
+    private String examName;
+    private Date examDate;
+    private String examDateStr;
 
-
-        public ExamListItem() {
-            //this.id = id;
-            this.examDate = new Date();
-            this.examDateStr = "";
-            }
-
-        public ExamListItem(String exameName, Date examDate) {
-            this.examDate = examDate;
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/mm/dd");
-            this.examDateStr = sdf.format(examDate);
-            this.examName = exameName;
-
+    public ExamListItem() {
+        //this.id = id;
+        this.examDate = new Date();
+        this.examDateStr = "";
         }
 
-        public ExamListItem(String exameName) {
-            //this.id = id;
-            this.examName = exameName;
-            //this.exameDate = exameDate;
+    public ExamListItem(String exameName, Date examDate) {
+        this.examDate = examDate;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        this.examDateStr = sdf.format(examDate);
+        this.examName = exameName;
+        }
+
+    public ExamListItem(String exameName) {
+        this.examName = exameName;
         }
 
     public String getExamDateStr() {
@@ -64,4 +59,4 @@ public class ExamListItem implements Comparable<ExamListItem> {
         return getExamDateStr().compareTo(o.getExamDateStr());
     }
 
-}
+    }
